@@ -21,74 +21,38 @@ Stage: build
     export POETRY_VIRTUALENVS_IN_PROJECT=true
     curl -sSL https://install.python-poetry.org | python3.11 -
 
-    ####################
-    # LASSO BENCHMARKS #
-    ####################
-
+    ######################
+    # INSTALL BENCHMARKS #
+    ######################
 
     cd /opt
-    if [ ! -d "/opt/BencherBenchmarks" ]; then
-        git clone --depth 1 https://LeoIV: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@github.com/LeoIV/BencherBenchmarks.git
-    fi
-    cd BencherBenchmarks/LassoBenchmarks
-    poetry install -v
 
-    # define service file for systemd that runs 'poetry run lasso-benchmark'
-    echo "[Unit]
-    Description=Lasso Benchmark Service
-    After=network.target
+    git clone --depth 1 https://LeoIV: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@github.com/LeoIV/BencherBenchmarks.git
 
-    [Service]
-    Type=simple
-    User=root
-    WorkingDirectory=/opt/BencherBenchmarks/LassoBenchmarks
-    ExecStart=/opt/poetry/bin/poetry run lasso-benchmark
-    Restart=on-failure
-
-    [Install]
-    WantedBy=multi-user.target" > /etc/systemd/system/lasso-benchmark.service
-
-    #####################
-    # Mopta08 BENCHMARK #
-    #####################
-
-
-    cd /opt/
-
-    # check if BencherBenchmarks is already cloned
-    if [ ! -d "/opt/BencherBenchmarks" ]; then
-        git clone --depth 1 https://LeoIV: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@github.com/LeoIV/BencherBenchmarks.git
-    fi
-
-    cd BencherBenchmarks/Mopta08Benchmark
-    poetry install -v
-
-    # define service file for systemd that runs 'poetry run mopta08-benchmark'
-    echo "[Unit]
-    Description=Mopta08 Benchmark Service
-    After=network.target
-
-    [Service]
-    Type=simple
-    User=root
-    WorkingDirectory=/opt/BencherBenchmarks/Mopta08Benchmark
-    ExecStart=/opt/poetry/bin/poetry run mopta08-benchmark
-    Restart=on-failure
-
-    [Install]
-    WantedBy=multi-user.target" > /etc/systemd/system/mopta08-benchmark.service
+    for dir in /opt/BencherBenchmarks/*; do
+        if [ -d "$dir" ]; then
+            echo "Installing benchmark service for $dir"
+            cd $dir
+            poetry install
+        fi
+    done
 
     ##################
     # BENCHER CLIENT #
     ##################
 
     cd /opt
+
     git clone --depth 1 https://LeoIV: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@github.com/LeoIV/bencherclient.git
     cd bencherclient
     poetry install
 
+    ###########
+    # CLEANUP #
+    ###########
+
     # remove build dependencies
-    apt remove  -y $PROGRAMS
+    apt remove -y $PROGRAMS
     apt autoremove -y
 
     # clean up
@@ -97,15 +61,41 @@ Stage: build
     rm -rf /root/.cache/pypoetry/*
 
 %startscript
-    # enable services
-    systemctl enable lasso-benchmark.service
-    systemctl enable mopta08-benchmark.service
+    echo "Container was started"
 
-    # start service
-    systemctl start lasso-benchmark.service
-    systemctl start mopta08-benchmark.service
+    export POETRY_VIRTUALENVS_PATH=/opt/virtualenvs
+    export POETRY_HOME=/opt/poetry
+    export PATH="/opt/poetry/bin:$PATH"
+    export POETRY_VIRTUALENVS_IN_PROJECT=true
+
+    # loop over all dirs in /opt/BencherBenchmarks and execute poetry run start-benchmark-service for each
+    for dir in /opt/BencherBenchmarks/*; do
+        if [ -d "$dir" ]; then
+            echo "Starting benchmark service for $dir"
+            cd $dir
+            bash -c "PATH='/opt/poetry/bin:$PATH' poetry run start-benchmark-service &"
+        fi
+    done
 
 %runscript
     echo "Container was created"
     echo "Arguments received: $*"
-    bash -c "PATH='/opt/poetry/bin:$PATH' cd /opt/bencherclient && PATH='/opt/poetry/bin:$PATH' poetry run client-start"
+
+    export POETRY_VIRTUALENVS_PATH=/opt/virtualenvs
+    export POETRY_HOME=/opt/poetry
+    export PATH="/opt/poetry/bin:$PATH"
+    export POETRY_VIRTUALENVS_IN_PROJECT=true
+
+    # loop over all dirs in /opt/BencherBenchmarks and execute poetry runstart-benchmark-service for each
+    for dir in /opt/BencherBenchmarks/*; do
+        if [ -d "$dir" ]; then
+            echo "Starting benchmark service for $dir"
+            cd $dir
+            nohup bash -c "PATH='/opt/poetry/bin:$PATH' poetry run start-benchmark-service &"
+        fi
+    done
+
+    # wait for all benchmark services to start
+    sleep 5
+
+    bash -c "PATH='/opt/poetry/bin:$PATH' cd /opt/bencherclient && PATH='/opt/poetry/bin:$PATH' poetry run $*"

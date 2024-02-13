@@ -31,6 +31,13 @@ def main():
         ], 50054
     )
 
+    server.register_stub(
+        [
+            'maxsat60',
+            'maxsat125'
+        ], 50055
+    )
+
     server.start()
 
     br = BenchmarkRequest(
