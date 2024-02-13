@@ -1,8 +1,19 @@
+import argparse
+
 from bencherscaffold.bencher_pb2 import BenchmarkRequest
 from bencherserver.server import BencherServer
 
 
 def main():
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument(
+        '-b', '--benchmark', type=str, required=True, help='The name of the benchmark to evaluate'
+    )
+    argparser.add_argument(
+        '-p', '--point', nargs='+', type=float, required=True, help='The point to evaluate'
+    )
+    args = argparser.parse_args()
+
     server = BencherServer()
     server.register_stub(
         [
@@ -16,8 +27,8 @@ def main():
     server.start()
 
     br = BenchmarkRequest(
-        benchmark='lasso-dna',
-        point={'values': [1.0] * 180}
+        benchmark=args.benchmark,
+        point={'values': args.point}
     )
 
     val = server.EvaluatePoint(br)
