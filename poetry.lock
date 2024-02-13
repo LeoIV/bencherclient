@@ -37,7 +37,7 @@ protobuf = "^4.25.2"
 type = "git"
 url = "https://LeoIV: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@github.com/LeoIV/BencherServer.git"
 reference = "master"
-resolved_reference = "81a2a6a9d27a48f8354c4a3b01a4beae84de8d04"
+resolved_reference = "23fa88d02b9f428480149dabe957aa0a689546fe"
 
 [[package]]
 name = "grpcio"
