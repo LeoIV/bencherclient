@@ -23,6 +23,10 @@ Stage: build
     export PATH="/opt/poetry/bin:$PATH"
     export POETRY_VIRTUALENVS_IN_PROJECT=true
     export MUJOCO_PY_MUJOCO_PATH=/opt/mujoco210
+    export LD_LIBRARY_PATH=$MUJOCO_PY_MUJOCO_PATH:/bin/usr/local/nvidia/lib64:/usr/lib/nvidia:$LD_LIBRARY_PATH
+    export PYENV_ROOT="/opt/.pyenv"
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    export PATH="$PYENV_ROOT/shims:$PATH"
 
     ####################
     # CONFIGURE MUJOCO #
@@ -41,12 +45,9 @@ Stage: build
     #################
     # INSTALL PYENV #
     #################
+
     cd /opt
     git clone --depth=1 https://github.com/pyenv/pyenv.git .pyenv
-    export PYENV_ROOT="/opt/.pyenv"
-    export PATH="$PYENV_ROOT/bin:$PATH"
-    # add shims to PATH
-    export PATH="$PYENV_ROOT/shims:$PATH"
 
     ######################
     # INSTALL BENCHMARKS #
