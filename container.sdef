@@ -8,9 +8,12 @@ Stage: build
     export POETRY_VIRTUALENVS_PATH=/opt/virtualenvs
     export POETRY_HOME=/opt/poetry
     export POETRY_VIRTUALENVS_IN_PROJECT=true
+    export MUJOCO_PY_MUJOCO_PATH=/opt/mujoco210
 
 %post
-    PROGRAMS="git curl gcc g++ build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python3-openssl swig"
+    PROGRAMS="git curl gcc g++ build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget \
+    curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python3-openssl swig \
+    libglew-dev patchelf libosmesa6-dev libgl1-mesa-glx wget"
     apt update -y
     apt install -y $PROGRAMS
 
@@ -19,6 +22,20 @@ Stage: build
     export POETRY_HOME=/opt/poetry
     export PATH="/opt/poetry/bin:$PATH"
     export POETRY_VIRTUALENVS_IN_PROJECT=true
+    export MUJOCO_PY_MUJOCO_PATH=/opt/mujoco210
+
+    ####################
+    # CONFIGURE MUJOCO #
+    ####################
+
+    wget https://github.com/google-deepmind/mujoco/releases/download/2.1.0/mujoco210-linux-x86_64.tar.gz
+    tar -xf mujoco210-linux-x86_64.tar.gz
+    rm mujoco210-linux-x86_64.tar.gz
+
+    ##################
+    # INSTALL POETRY #
+    ##################
+
     curl -sSL https://install.python-poetry.org | python3.11 -
 
     #################
@@ -45,15 +62,16 @@ Stage: build
             if [ -f "$dir/.python-version" ]; then
                 echo "Installing python version for $dir"
                 cd $dir
-                pyenv install $(cat .python-version)
+                # try to install, print 'already installed' if it fails
+                pyenv install $(cat .python-version) || echo "pyenv already installed version $(cat .python-version)"
                 echo $PYENV_VERSION
                 poetry env use $(cat .python-version)
             fi
-            poetry env info
             echo "Installing benchmark service for $dir"
             cd $dir
             POETRY_INSTALLER_MAX_WORKERS=1 poetry install -v
-            # reset poetry env
+            poetry env info
+            # reset poetry env if .python-version file exists
             if [ -f "$dir/.python-version" ]; then
                 poetry env use system
             fi
