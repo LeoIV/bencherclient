@@ -1,7 +1,8 @@
 from bencherscaffold.bencher_pb2 import BenchmarkRequest
 from bencherserver.server import BencherServer
 
-if __name__ == '__main__':
+
+def main():
     server = BencherServer()
     server.register_stub(
         [
@@ -22,3 +23,7 @@ if __name__ == '__main__':
     val = server.EvaluatePoint(br)
     print(val)
     server.stop()
+
+
+if __name__ == '__main__':
+    main()

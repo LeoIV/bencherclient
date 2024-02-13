@@ -39,6 +39,14 @@ Stage: build
     [Install]
     WantedBy=multi-user.target" > /etc/systemd/system/lasso-benchmark.service
 
+    ##################
+    # BENCHER CLIENT #
+    ##################
+
+    cd /opt
+    git clone --depth 1 https://LeoIV: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@github.com/LeoIV/bencherclient.git
+    cd bencherclient
+    poetry install -v
 
     # remove build dependencies
     apt remove  -y $PROGRAMS
@@ -60,4 +68,4 @@ Stage: build
 %runscript
     echo "Container was created"
     echo "Arguments received: $*"
-    bash -c "PATH='/opt/poetry/bin:$PATH' cd /opt/BOIR && PATH='/opt/poetry/bin:$PATH' poetry run $*"
+    bash -c "PATH='/opt/poetry/bin:$PATH' cd /opt/bencherclient && PATH='/opt/poetry/bin:$PATH' poetry run client-start"

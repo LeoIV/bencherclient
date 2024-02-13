@@ -12,6 +12,9 @@ packages = [
 python = "^3.11"
 bencherserver = { git = "https://LeoIV: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@github.com/LeoIV/BencherServer.git", branch = "master" }
 
+[tool.poetry.scripts]
+client-start = "bencherclient.client:main"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
