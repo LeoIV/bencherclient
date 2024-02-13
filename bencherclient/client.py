@@ -24,6 +24,13 @@ def main():
             'lasso-hard'
         ], 50053
     )
+
+    server.register_stub(
+        [
+            'mopta08'
+        ], 50054
+    )
+
     server.start()
 
     br = BenchmarkRequest(
