@@ -10,7 +10,7 @@ Stage: build
     export POETRY_VIRTUALENVS_IN_PROJECT=true
 
 %post
-    PROGRAMS="git curl gcc g++"
+    PROGRAMS="git curl gcc g++ build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python3-openssl swig"
     apt update -y
     apt install -y $PROGRAMS
 
@@ -20,6 +20,16 @@ Stage: build
     export PATH="/opt/poetry/bin:$PATH"
     export POETRY_VIRTUALENVS_IN_PROJECT=true
     curl -sSL https://install.python-poetry.org | python3.11 -
+
+    #################
+    # INSTALL PYENV #
+    #################
+    cd /opt
+    git clone --depth=1 https://github.com/pyenv/pyenv.git .pyenv
+    export PYENV_ROOT="/opt/.pyenv"
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    # add shims to PATH
+    export PATH="$PYENV_ROOT/shims:$PATH"
 
     ######################
     # INSTALL BENCHMARKS #
@@ -31,9 +41,22 @@ Stage: build
 
     for dir in /opt/BencherBenchmarks/*; do
         if [ -d "$dir" ]; then
+            # check if .python-version file exists, and install with pyenv if it does
+            if [ -f "$dir/.python-version" ]; then
+                echo "Installing python version for $dir"
+                cd $dir
+                pyenv install $(cat .python-version)
+                echo $PYENV_VERSION
+                poetry env use $(cat .python-version)
+            fi
+            poetry env info
             echo "Installing benchmark service for $dir"
             cd $dir
-            poetry install
+            POETRY_INSTALLER_MAX_WORKERS=1 poetry install -v
+            # reset poetry env
+            if [ -f "$dir/.python-version" ]; then
+                poetry env use system
+            fi
         fi
     done
 
@@ -85,17 +108,5 @@ Stage: build
     export POETRY_HOME=/opt/poetry
     export PATH="/opt/poetry/bin:$PATH"
     export POETRY_VIRTUALENVS_IN_PROJECT=true
-
-    # loop over all dirs in /opt/BencherBenchmarks and execute poetry runstart-benchmark-service for each
-    for dir in /opt/BencherBenchmarks/*; do
-        if [ -d "$dir" ]; then
-            echo "Starting benchmark service for $dir"
-            cd $dir
-            nohup bash -c "PATH='/opt/poetry/bin:$PATH' poetry run start-benchmark-service &"
-        fi
-    done
-
-    # wait for all benchmark services to start
-    sleep 5
 
     bash -c "PATH='/opt/poetry/bin:$PATH' cd /opt/bencherclient && PATH='/opt/poetry/bin:$PATH' poetry run $*"

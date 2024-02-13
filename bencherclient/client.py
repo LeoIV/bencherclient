@@ -38,6 +38,13 @@ def main():
         ], 50055
     )
 
+    server.register_stub(
+        [
+            'robotpushing',
+            'rover'
+        ], 50056
+    )
+
     server.start()
 
     br = BenchmarkRequest(
