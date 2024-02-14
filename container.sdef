@@ -23,7 +23,7 @@ Stage: build
     export PATH="/opt/poetry/bin:$PATH"
     export POETRY_VIRTUALENVS_IN_PROJECT=true
     export MUJOCO_PY_MUJOCO_PATH=/opt/mujoco210
-    export LD_LIBRARY_PATH=$MUJOCO_PY_MUJOCO_PATH:/bin/usr/local/nvidia/lib64:/usr/lib/nvidia:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=${MUJOCO_PY_MUJOCO_PATH}/bin:/bin/usr/local/nvidia/lib64:/usr/lib/nvidia:$LD_LIBRARY_PATH
     export PYENV_ROOT="/opt/.pyenv"
     export PATH="$PYENV_ROOT/bin:$PATH"
     export PATH="$PYENV_ROOT/shims:$PATH"
@@ -35,12 +35,17 @@ Stage: build
     wget https://github.com/google-deepmind/mujoco/releases/download/2.1.0/mujoco210-linux-x86_64.tar.gz
     tar -xf mujoco210-linux-x86_64.tar.gz
     rm mujoco210-linux-x86_64.tar.gz
+    # remove /tmp/mujocopy-buildlock
+    rm -rf /tmp/mujocopy-buildlock
+    #mkdir /tmp/mujocopy-buildlock || true
+    #chmod 777 /tmp/mujocopy-buildlock
 
     ##################
     # INSTALL POETRY #
     ##################
 
     curl -sSL https://install.python-poetry.org | python3.11 -
+
 
     #################
     # INSTALL PYENV #
@@ -70,7 +75,8 @@ Stage: build
             fi
             echo "Installing benchmark service for $dir"
             cd $dir
-            POETRY_INSTALLER_MAX_WORKERS=1 poetry install -v
+            #POETRY_INSTALLER_MAX_WORKERS=1 poetry install -v
+            poetry install -v
             poetry env info
             # reset poetry env if .python-version file exists
             if [ -f "$dir/.python-version" ]; then
