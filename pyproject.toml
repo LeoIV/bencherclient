@@ -10,7 +10,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.11"
-bencherserver = { git = "https://LeoIV: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@github.com/LeoIV/BencherServer.git", branch = "master" }
+bencherscaffold = { git = "https://LeoIV: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@github.com/LeoIV/BencherScaffold.git", branch = "master" }
 
 [tool.poetry.scripts]
 client-start = "bencherclient.client:main"

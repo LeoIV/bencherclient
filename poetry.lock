@@ -17,27 +17,7 @@ protobuf = "^4.25.2"
 type = "git"
 url = "https://LeoIV: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@github.com/LeoIV/BencherScaffold.git"
 reference = "master"
-resolved_reference = "bba766d1012fe0a59e1962557c4e806ac6dc6f46"
-
-[[package]]
-name = "bencherserver"
-version = "0.1.0"
-description = ""
-optional = false
-python-versions = "^3.11"
-files = []
-develop = false
-
-[package.dependencies]
-bencherscaffold = {git = "https://LeoIV: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@github.com/LeoIV/BencherScaffold.git", branch = "master"}
-grpcio = "^1.60.1"
-protobuf = "^4.25.2"
-
-[package.source]
-type = "git"
-url = "https://LeoIV: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@github.com/LeoIV/BencherServer.git"
-reference = "master"
-resolved_reference = "23fa88d02b9f428480149dabe957aa0a689546fe"
+resolved_reference = "61636ae4575683b1c06dc917b56f11e132ec2725"
 
 [[package]]
 name = "certifi"
@@ -287,4 +267,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "e758506721f56fb5931a5942cfc208772e2e8cec99a2deafed222208451b6f12"
+content-hash = "479aadb386983efc678b4347f2e47ec2670486d1b9662126245c6a7e201406f5"

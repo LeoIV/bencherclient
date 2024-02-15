@@ -23,20 +23,14 @@ if __name__ == '__main__':
     registry = response.json()
 
     for benchmarkname, properties in registry.items():
-
         dimensions = properties['dimensions']
 
         print(f"benchmarkname: {benchmarkname}, dimensions: {dimensions}")
 
-        try:
-            res = stub.EvaluatePoint(
-                BenchmarkRequest(
-                    benchmark=benchmarkname,
-                    point={'values': [1] * dimensions}
-                )
+        res = stub.EvaluatePoint(
+            BenchmarkRequest(
+                benchmark=benchmarkname,
+                point={'values': [1] * dimensions}
             )
-            print(res)
-        except grpc.RpcError as e:
-            raise e
-            #print(e.details())
-            #continue
+        )
+        print(res)
