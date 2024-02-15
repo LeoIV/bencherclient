@@ -15,6 +15,9 @@ bencherserver = { git = "https://LeoIV:github_pat_11ADJZ5EY0jbro9MDn4UBi_8NBADHn
 [tool.poetry.scripts]
 client-start = "bencherclient.client:main"
 
+[tool.poetry.group.dev.dependencies]
+requests = "^2.31.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
