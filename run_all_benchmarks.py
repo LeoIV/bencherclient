@@ -8,6 +8,8 @@ if __name__ == '__main__':
         grpc.insecure_channel(f"127.0.0.1:{50051}")
     )
 
+    print(stub)
+
     headers = {
         'Authorization': 'token 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',
         'Accept'       : 'application/vnd.github.v3.raw',
@@ -35,5 +37,6 @@ if __name__ == '__main__':
             )
             print(res)
         except grpc.RpcError as e:
-            print(e.details())
-            continue
+            raise e
+            #print(e.details())
+            #continue

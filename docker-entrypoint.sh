@@ -9,10 +9,12 @@ export POETRY_VIRTUALENVS_IN_PROJECT=true
 
 # loop over all dirs in /opt/BencherBenchmarks and execute poetry run start-benchmark-service for each
 for dir in /opt/BencherBenchmarks/*; do
+    echo "Checking $dir"
     if [ -d "$dir" ]; then
         echo "Starting benchmark service for $dir"
         cd $dir
         bash -c "PATH='/opt/poetry/bin:$PATH' poetry run start-benchmark-service &"
+        cd ..
     fi
 done
 
