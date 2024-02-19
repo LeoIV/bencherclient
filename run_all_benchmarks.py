@@ -1,7 +1,11 @@
+import time
+
 import grpc
 import requests
 from bencherscaffold.bencher_pb2 import BenchmarkRequest
 from bencherscaffold.bencher_pb2_grpc import BencherStub
+
+N_RETRIES = 5
 
 if __name__ == '__main__':
     stub = BencherStub(
@@ -23,14 +27,25 @@ if __name__ == '__main__':
     registry = response.json()
 
     for benchmarkname, properties in registry.items():
+
         dimensions = properties['dimensions']
 
         print(f"benchmarkname: {benchmarkname}, dimensions: {dimensions}")
-
-        res = stub.EvaluatePoint(
-            BenchmarkRequest(
-                benchmark=benchmarkname,
-                point={'values': [1] * dimensions}
-            )
-        )
-        print(res)
+        for n_retry in range(N_RETRIES):
+            try:
+                res = stub.EvaluatePoint(
+                    BenchmarkRequest(
+                        benchmark=benchmarkname,
+                        point={'values': [1] * dimensions}
+                    )
+                )
+                print(res)
+                break
+            except Exception as e:
+                if n_retry < N_RETRIES - 1:
+                    print(f'error: {e}')
+                    # sleep for 5 seconds
+                    time.sleep(5)
+                else:
+                    print(f'error: {e}')
+                    raise e
