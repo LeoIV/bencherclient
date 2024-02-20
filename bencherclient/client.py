@@ -52,7 +52,7 @@ def main():
         point={'values': args.point}
     )
 
-    val = server.EvaluatePoint(br)
+    val = server.evaluate_point(br)
     print(val)
     server.stop()
 

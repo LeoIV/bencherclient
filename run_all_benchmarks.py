@@ -33,7 +33,7 @@ if __name__ == '__main__':
         print(f"benchmarkname: {benchmarkname}, dimensions: {dimensions}")
         for n_retry in range(N_RETRIES):
             try:
-                res = stub.EvaluatePoint(
+                res = stub.evaluate_point(
                     BenchmarkRequest(
                         benchmark=benchmarkname,
                         point={'values': [1] * dimensions}
