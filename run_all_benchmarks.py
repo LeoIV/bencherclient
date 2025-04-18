@@ -1,22 +1,14 @@
-import time
-
-import grpc
 import requests
-from bencherscaffold.bencher_pb2 import BenchmarkRequest
-from bencherscaffold.bencher_pb2_grpc import BencherStub
-
-N_RETRIES = 5
+from bencherscaffold.client import BencherClient
+from bencherscaffold.protoclasses.bencher_pb2 import PointType
 
 if __name__ == '__main__':
-    stub = BencherStub(
-        grpc.insecure_channel(f"127.0.0.1:{50051}")
-    )
 
-    print(stub)
+    client = BencherClient()
 
     headers = {
         'Authorization': 'token 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',
-        'Accept'       : 'application/vnd.github.v3.raw',
+        'Accept': 'application/vnd.github.v3.raw',
     }
 
     response = requests.get(
@@ -27,25 +19,27 @@ if __name__ == '__main__':
     registry = response.json()
 
     for benchmarkname, properties in registry.items():
-
         dimensions = properties['dimensions']
+        benchmark_type = properties['type']
+        # types can be PURELY_CONTINUOUS, PURELY_BINARY,PURELY_CATEGORICAL,PURELY_ORDINAL_REAL,PURELY_ORDINAL_INT, MIXED (lower case)
+        # but we only support PURELY_CONTINUOUS, PURELY_BINARY,PURELY_CATEGORICAL,PURELY_ORDINAL_INT
+        # create point type
+        match benchmark_type:
+            case 'purely_continuous':
+                point_type = PointType.CONTINUOUS
+                values = [0.5] * dimensions
+            case 'purely_binary':
+                point_type = PointType.BINARY
+                values = [0] * dimensions
+            case 'purely_categorical':
+                point_type = PointType.CATEGORICAL
+                values = [0] * dimensions
+            case 'purely_ordinal_int':
+                point_type = PointType.PURELY_ORDINAL_INT
+                values = [0] * dimensions
 
-        print(f"benchmarkname: {benchmarkname}, dimensions: {dimensions}")
-        for n_retry in range(N_RETRIES):
-            try:
-                res = stub.evaluate_point(
-                    BenchmarkRequest(
-                        benchmark=benchmarkname,
-                        point={'values': [1] * dimensions}
-                    )
-                )
-                print(res)
-                break
-            except Exception as e:
-                if n_retry < N_RETRIES - 1:
-                    print(f'error: {e}')
-                    # sleep for 5 seconds
-                    time.sleep(5)
-                else:
-                    print(f'error: {e}')
-                    raise e
+        client.evaluate_point(
+            benchmark_name=benchmarkname,
+            point=values,
+            type=point_type
+        )
