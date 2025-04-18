@@ -9,7 +9,7 @@ N_RETRIES = 5
 
 if __name__ == '__main__':
     stub = BencherStub(
-        grpc.insecure_channel(f"localhost:{50051}")
+        grpc.insecure_channel(f"127.0.0.1:{50051}")
     )
 
     print(stub)
