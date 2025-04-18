@@ -15,7 +15,7 @@ if __name__ == '__main__':
     print(stub)
 
     headers = {
-        'Authorization': 'token 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',
+        'Authorization': 'token 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',
         'Accept'       : 'application/vnd.github.v3.raw',
     }
 
