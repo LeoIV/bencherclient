@@ -1,3 +1,5 @@
+import random
+
 import requests
 from bencherscaffold.client import BencherClient
 from bencherscaffold.protoclasses.bencher_pb2 import PointType
@@ -24,6 +26,11 @@ if __name__ == '__main__':
         # types can be PURELY_CONTINUOUS, PURELY_BINARY,PURELY_CATEGORICAL,PURELY_ORDINAL_REAL,PURELY_ORDINAL_INT, MIXED (lower case)
         # but we only support PURELY_CONTINUOUS, PURELY_BINARY,PURELY_CATEGORICAL,PURELY_ORDINAL_INT
         # create point type
+
+        # if dimension is None, sample one between 1 and 10
+        if dimensions is None:
+            dimensions = random.randint(1, 10)
+
         match benchmark_type:
             case 'purely_continuous':
                 point_type = PointType.CONTINUOUS
