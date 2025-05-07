@@ -1,3 +1,4 @@
+import math
 import random
 
 import requests
@@ -30,6 +31,12 @@ if __name__ == '__main__':
         # if dimension is None, sample one between 1 and 10
         if dimensions is None:
             dimensions = random.randint(1, 10)
+            # resample until not perfect square
+            while math.sqrt(dimensions) % 1 == 0:
+                dimensions = random.randint(1, 10)
+        if benchmarkname in ['pbo-isingtriangular', 'pbo-nqueens']:
+            # needs to be perfect square
+            dimensions = dimensions ** 2
 
         match benchmark_type:
             case 'purely_continuous':
@@ -44,9 +51,14 @@ if __name__ == '__main__':
             case 'purely_ordinal_int':
                 point_type = PointType.PURELY_ORDINAL_INT
                 values = [0] * dimensions
-
-        client.evaluate_point(
-            benchmark_name=benchmarkname,
-            point=values,
-            type=point_type
-        )
+            case _:
+                raise ValueError(f"Unsupported benchmark type: {benchmark_type}")
+        try:
+            client.evaluate_point(
+                benchmark_name=benchmarkname,
+                point=values,
+                type=point_type
+            )
+            print(f"Evaluated {benchmarkname} with dimensions {dimensions} and type {benchmark_type}")
+        except Exception as e:
+            print(f"Error evaluating {benchmarkname}: {e}")
