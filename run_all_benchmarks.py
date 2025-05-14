@@ -55,11 +55,8 @@ if __name__ == '__main__':
                     raise ValueError(f"Unsupported benchmark type: {benchmark_type}")
             case _:
                 raise ValueError(f"Unsupported benchmark type: {benchmark_type}")
-        try:
-            client.evaluate_point(
-                benchmark_name=benchmarkname,
-                point=values
-            )
-            print(f"Evaluated {benchmarkname} with dimensions {dimensions} and type {benchmark_type}")
-        except Exception as e:
-            print(f"Error evaluating {benchmarkname}: {e}")
+        client.evaluate_point(
+            benchmark_name=benchmarkname,
+            point=values
+        )
+        print(f"Evaluated {benchmarkname} with dimensions {dimensions} and type {benchmark_type}")
