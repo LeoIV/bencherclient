@@ -3,7 +3,7 @@ import random
 
 import requests
 from bencherscaffold.client import BencherClient
-from bencherscaffold.protoclasses.bencher_pb2 import PointType
+from bencherscaffold.protoclasses.bencher_pb2 import Value, ValueType
 
 if __name__ == '__main__':
 
@@ -11,7 +11,7 @@ if __name__ == '__main__':
 
     headers = {
         'Authorization': 'token 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',
-        'Accept': 'application/vnd.github.v3.raw',
+        'Accept'       : 'application/vnd.github.v3.raw',
     }
 
     response = requests.get(
@@ -40,24 +40,25 @@ if __name__ == '__main__':
 
         match benchmark_type:
             case 'purely_continuous':
-                point_type = PointType.CONTINUOUS
-                values = [0.5] * dimensions
+                values = [Value(type=ValueType.CONTINUOUS, value=0.5) for _ in range(dimensions)]
             case 'purely_binary':
-                point_type = PointType.BINARY
-                values = [0] * dimensions
+                values = [Value(type=ValueType.BINARY, value=0) for _ in range(dimensions)]
             case 'purely_categorical':
-                point_type = PointType.CATEGORICAL
-                values = [0] * dimensions
+                values = [Value(type=ValueType.CATEGORICAL, value=0) for _ in range(dimensions)]
             case 'purely_ordinal_int':
-                point_type = PointType.PURELY_ORDINAL_INT
-                values = [0] * dimensions
+                values = [Value(type=ValueType.INTEGER, value=0) for _ in range(dimensions)]
+            case 'mixed':
+                if benchmarkname == 'svmmixed':
+                    values = [Value(type=ValueType.BINARY, value=0) for _ in range(50)]
+                    values += [Value(type=ValueType.CONTINUOUS, value=0.5) for _ in range(3)]
+                else:
+                    raise ValueError(f"Unsupported benchmark type: {benchmark_type}")
             case _:
                 raise ValueError(f"Unsupported benchmark type: {benchmark_type}")
         try:
             client.evaluate_point(
                 benchmark_name=benchmarkname,
-                point=values,
-                type=point_type
+                point=values
             )
             print(f"Evaluated {benchmarkname} with dimensions {dimensions} and type {benchmark_type}")
         except Exception as e:
