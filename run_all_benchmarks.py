@@ -9,14 +9,9 @@ if __name__ == '__main__':
 
     client = BencherClient()
 
-    headers = {
-        'Authorization': 'token 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',
-        'Accept'       : 'application/vnd.github.v3.raw',
-    }
 
     response = requests.get(
         'https://raw.githubusercontent.com/LeoIV/bencher/master/BencherServer/bencherserver/benchmark-registry.json',
-        headers=headers
     )
 
     registry = response.json()
